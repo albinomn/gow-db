@@ -1,43 +1,59 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 )
 
-type DB struct {
+type gowDB struct {
 	filePath string
 	file *os.File
+	Data []byte
 }
 
-func (d* DB) Create(path string) {
-	f, err := os.Create(path)
+func New(filePath string) gowDB {
+	var f *os.File
+	f, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal(err)
+		f, err = os.Create(filePath)
 	}
-
-	d.file = f
+	return gowDB{filePath: filePath, file: f}
 }
 
-func (d* DB) Close() {
+func (d* gowDB) Close() {
 	d.file.Close()
 }
+
+func (d* gowDB) Write() {
+	d.file.WriteString(string(d.Data))
+}
+
+func (d* gowDB) Read() {
+	data, err := os.ReadFile(d.filePath)
+	if err != nil {
+		log.Fatal("File doesn't exist")
+	}
+
+	d.Data = data
+}
+
 func main () {
-	newDb := DB{filePath: "data.json"}
-	f, err := os.Create(newDb.filePath)
+	newDb := New("data.json")
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer f.Close()
+	defer newDb.Close()
 	
-	ogMsg := map[string]map[string]string{"Data": {"Boa": "noite"}}
-	msg, err := json.Marshal(ogMsg)
-	_, err = f.WriteString(string(msg))
+	//ogMsg := map[string]map[string]string{"Data": {"Boa": "noite"}}
+	//msg, err := json.Marshal(ogMsg)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	//newDb.Data = msg
+
+	//newDb.Write()
+
+	newDb.Read()
+
+	fmt.Printf("%s", string(newDb.Data))
 }
