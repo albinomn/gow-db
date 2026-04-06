@@ -3,18 +3,20 @@ package main
 import "fmt"
 
 type Player struct {
+	Model
 	Name string `json:"name"`
 	Age  int    `json:"age"`
-	Model
 }
 
 func main() {
-	db := NewDB[*Player]("player.json")
+	db := New[*Player](Options{Filename: "player.json", AutoIncrement: true})
 
 	newPlayer := Player{Name: "Albino", Age: 30}
 
 	fmt.Printf("New player %s\n", newPlayer.Name)
 
-	db.Push(&newPlayer)
+	db.Insert(&newPlayer)
 	db.Save()
+	newPlayer.Age = 31
+	db.Update(&newPlayer)
 }

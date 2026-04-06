@@ -9,7 +9,7 @@ type Entity interface {
 	SetID(string)
 }
 
-func (m *Model) GetID() string {
+func (m Model) GetID() string {
 	return m.Id
 }
 
